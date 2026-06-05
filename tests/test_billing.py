@@ -12,3 +12,11 @@ def test_minute_31_charges_one_hour_fraction():
 def test_charges_each_started_hour_after_grace_period():
     assert calculate_fee(90, vip=False) == 500
     assert calculate_fee(91, vip=False) == 1000
+
+
+def test_applies_daily_cap_for_24_hours():
+    assert calculate_fee(24 * 60, vip=False) == 12000
+
+
+def test_applies_daily_cap_per_started_day():
+    assert calculate_fee((24 * 60) + 31, vip=False) == 12500
