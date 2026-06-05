@@ -1,3 +1,5 @@
+import pytest
+
 from parkinguv.billing import calculate_fee
 
 
@@ -28,3 +30,8 @@ def test_vip_discount_is_applied_before_daily_cap():
 
 def test_vip_discount_applies_to_short_stays():
     assert calculate_fee(91, vip=True) == 800
+
+
+def test_negative_minutes_are_rejected():
+    with pytest.raises(ValueError):
+        calculate_fee(-1, vip=False)
