@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Unit tests
+        run: pytest
+      - name: BDD tests
+        run: behave
+      - name: Basic security scan
+        run: bandit -r parkinguv
+
+  performance:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Start API
+        run: |
+          uvicorn parkinguv.api:app --host 127.0.0.1 --port 8000 &
+          sleep 3
+      - name: Performance test
+        run: locust --headless --users 20 --spawn-rate 10 --run-time 15s --host http://127.0.0.1:8000
