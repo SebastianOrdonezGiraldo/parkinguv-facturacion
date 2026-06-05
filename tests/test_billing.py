@@ -20,3 +20,11 @@ def test_applies_daily_cap_for_24_hours():
 
 def test_applies_daily_cap_per_started_day():
     assert calculate_fee((24 * 60) + 31, vip=False) == 12500
+
+
+def test_vip_discount_is_applied_before_daily_cap():
+    assert calculate_fee(24 * 60, vip=True) == 9600
+
+
+def test_vip_discount_applies_to_short_stays():
+    assert calculate_fee(91, vip=True) == 800
